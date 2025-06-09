@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+    <style>
+        /* 讓購物車每筆項目橫向排列 */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            font-size: 18px;
+            white-space: nowrap;
+            /* 避免換行 */
+        }
+
+        /* 三個區塊比例調整 */
+        .cart-item>div {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cart-date {
+            flex: 2;
+        }
+
+        .cart-type {
+            flex: 3;
+            padding: 0 15px;
+        }
+
+        .cart-price {
+            flex: 1;
+            text-align: right;
+            font-weight: 700;
+        }
+
+
+        /* 增加carousel外層容器底部間距，避免被下方文字切到 */
+        #eventCarousel {
+            margin-bottom: 4rem;
+        }
+
+        /* 左右箭頭加背景和圓形 */
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            filter: invert(100%);
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            padding: 12px;
+        }
+
+        /* 調整箭頭按鈕位置與大小，讓點擊區域更大 */
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 4rem;
+            height: 4rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 1;
+        }
+
+        .more-info {
+            color: #6c757d;
+            /* Bootstrap text-muted 顏色 */
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover .more-info {
+            color: #0d6efd;
+            text-decoration: underline;
+        }
+
+        /* 🔹 自訂登入/註冊浮出表單樣式 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .popup-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+
+<body>
+    <!-- 🔹 導覽列 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+        <a class="navbar-brand d-flex align-items-center" href="index.html">
+            <img src="img/logo.jpg" alt="Logo" width="40" height="40" class="me-2 rounded-circle">
+            <span>Tixmart</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="events.html">活動總覽</a></li>
+                <li class="nav-item"><a class="nav-link" href="faq.html">常見問題</a></li>
+                <li class="nav-item"><a class="nav-link" href="about.html">關於我們</a></li>
+            </ul>
+            <div class="position-relative me-3">
+                <a href="cart.html" class="btn btn-danger position-relative">
+                    <i class="fas fa-shopping-cart"></i> 購物車
+                    <span id="cartCount"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="z-index: 1; font-size: 0.75rem;">
+                        0
+                    </span>
+                </a>
+            </div>
+
+            <button class="btn btn-outline-light me-2" onclick="openPopup('login')">登入</button>
+            <button class="btn btn-primary" onclick="openPopup('register')">註冊</button>
+        </div>
+
+        </div>
+    </nav>
+
+    <!-- 🔹 浮出式登入/註冊表單 -->
+    <div id="overlay" class="overlay">
+        <div class="popup-form">
+            <h5 id="popupTitle" class="mb-3">登入</h5>
+            <form onsubmit="return false;"> <!-- 防止真實送出，方便測試 -->
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <div class="d-flex flex-nowrap">
+                        <input type="email" id="emailInput" class="form-control flex-grow-1 rounded-0 rounded-start"
+                            placeholder="請輸入 Email" required>
+                        <button type="button" id="verifyBtn"
+                            class="btn btn-primary rounded-0 rounded-end ms-1 text-nowrap">驗證信箱</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">密碼</label>
+                    <input type="password" class="form-control" required>
+                    <button type="button" id="forgotPasswordBtn" class="btn btn-link p-0 mt-1"
+                        style="font-size: 0.875rem;">忘記密碼？</button>
+
+                </div>
+                <div id="confirmPasswordGroup" class="mb-3 d-none">
+                    <label class="form-label">確認密碼</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div id="nameGroup" class="mb-3 d-none">
+                    <label class="form-label">姓名</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div id="phoneGroup" class="mb-3 d-none">
+                    <label class="form-label">電話</label>
+                    <input type="tel" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 mb-2">送出</button>
+                <button type="button" class="btn btn-secondary w-100" onclick="closePopup()">取消</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">購物車</h1>
+        <div class="d-flex justify-content-between align-items-center my-3">
+            <h2 class="fs-4">購物車清單</h2>
+            <button id="clearCartBtn" class="btn btn-danger btn-sm" title="清空購物車">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+
+
+        <div id="cartItems">
+            <!-- 購物車項目會透過 JS 動態加進來 -->
+        </div>
+
+        <div class="text-end mt-4">
+            <h4>總金額：<span id="cartTotal">NT$0</span></h4>
+            <button class="btn btn-success">前往結帳</button>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/cart.js"></script>
+
+
+</body>
+
+</html>

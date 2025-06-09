@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ado test2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 🔹 自訂登入/註冊浮出表單樣式 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .popup-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        body {
+            background-color: #f7f7f7;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+
+        h1,
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto 4rem auto;
+        }
+
+        .intro-section {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            /* 讓兩欄高度對齊 */
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .visual-section img {
+            width: 300px;
+            /* 固定寬度 */
+            height: auto;
+            /* 高度自動依比例縮放 */
+            max-height: 100%;
+            /* 防止圖片太高撐開容器 */
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .description {
+            width: 500px;
+            /* 固定寬度與圖片一致 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+            background-color: #fff;
+            padding: 20px;
+            border-left: 6px solid #333;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+
+        .seating-map {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        #purchaseDetails {
+            margin-top: 85px;
+            /* 往下推一點 */
+        }
+
+        .seating-map {
+            display: block;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+        <a class="navbar-brand d-flex align-items-center" href="index.html">
+            <img src="img/logo.jpg" alt="Logo" width="40" height="40" class="me-2 rounded-circle">
+            <span>Tixmart</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="events.html">活動總覽</a></li>
+                <li class="nav-item"><a class="nav-link" href="faq.html">常見問題</a></li>
+                <li class="nav-item"><a class="nav-link" href="about.html">關於我們</a></li>
+            </ul>
+            <div class="d-flex">
+                <div class="position-relative me-3">
+                    <a href="cart.html" class="btn btn-danger position-relative">
+                        <i class="fas fa-shopping-cart"></i> 購物車
+                        <span id="cartCount"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="z-index: 1; font-size: 0.75rem;">
+                            0
+                        </span>
+                    </a>
+                </div>
+                <button class="btn btn-outline-light me-2" onclick="openPopup('login')">登入</button>
+                <button class="btn btn-primary" onclick="openPopup('register')">註冊</button>
+            </div>
+        </div>
+    </nav>
+    <!-- 🔹 浮出式登入/註冊表單 -->
+    <div id="overlay" class="overlay">
+        <div class="popup-form">
+            <h5 id="popupTitle" class="mb-3">登入</h5>
+            <form onsubmit="return false;"> <!-- 防止真實送出，方便測試 -->
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <div class="d-flex flex-nowrap">
+                        <input type="email" id="emailInput" class="form-control flex-grow-1 rounded-0 rounded-start"
+                            placeholder="請輸入 Email" required>
+                        <button type="button" id="verifyBtn"
+                            class="btn btn-primary rounded-0 rounded-end ms-1 text-nowrap">驗證信箱</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">密碼</label>
+                    <input type="password" class="form-control" required>
+                    <button type="button" id="forgotPasswordBtn" class="btn btn-link p-0 mt-1"
+                        style="font-size: 0.875rem;">忘記密碼？</button>
+
+                </div>
+                <div id="confirmPasswordGroup" class="mb-3 d-none">
+                    <label class="form-label">確認密碼</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div id="nameGroup" class="mb-3 d-none">
+                    <label class="form-label">姓名</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div id="phoneGroup" class="mb-3 d-none">
+                    <label class="form-label">電話</label>
+                    <input type="tel" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 mb-2">送出</button>
+                <button type="button" class="btn btn-secondary w-100" onclick="closePopup()">取消</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 id="eventName">Ado WORLD TOUR 2025 “Hibana” in Taipei</h1>
+
+        <div class="intro-section">
+            <div class="visual-section">
+                <img src="img/ado-3.jpg" alt="活動主視覺">
+            </div>
+            <div class="description">
+                <h2>活動介紹</h2>
+                <p>
+                    2025 世界巡迴演唱會「Hibana」
+                    將會是日本藝人史上最大規模的世界巡演之一✨
+                    「Hibana」即日文「火花」
+                    Ado 希望點燃她想在世界上燃起的火花
+                    展示自「Wish」巡演以來的成長
+                    獻上最精彩的演出！
+                </p>
+                <p>
+                    📅 日期：2026/05/11<br>
+                    📍 地點：林口體育館<br>
+                    🎟️ 詳見下方座位圖與票價說明
+                </p>
+            </div>
+        </div>
+
+        <h2>座位圖與購票</h2>
+        <div class="row justify-content-center align-items-start mt-4">
+            <!-- 座位圖 -->
+            <div class="col-md-6 mb-4 mb-md-0">
+                <img src="img/set.jpg" alt="座位圖" class="seating-map w-100">
+            </div>
+
+            <!-- 購票表單 -->
+            <div class="col-md-6">
+                <div class="ticket-purchase bg-white p-4 rounded shadow w-100">
+                    <h3>選擇活動日期購票</h3>
+
+                    <div class="btn-group mb-3" role="group" aria-label="活動日期選擇">
+                        <button type="button" class="btn btn-outline-primary date-btn" data-date="2025-05-11"
+                            data-floor-price="2800" data-seata-price="3200" data-seatb-price="2800">
+                            2025/05/11
+                        </button>
+                    </div>
+
+                    <div id="purchaseDetails" style="display:none;">
+                        <h5 id="selectedDateTitle"></h5>
+                        <form id="ticketForm">
+                            <div class="mb-3">
+                                <label for="ticketType" class="form-label">票種</label>
+                                <select class="form-select" id="ticketType" required>
+                                    <option value="" disabled selected>請選擇票種</option>
+                                    <option value="floor">一樓站席</option>
+                                    <option value="seatA">二樓坐席A</option>
+                                    <option value="seatB">二樓坐席B</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="ticketQty" class="form-label">張數</label>
+                                <input type="number" class="form-control" id="ticketQty" min="1" max="10" value="1"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">小計</label>
+                                <div id="subtotal" class="fw-bold">NT$0</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">立即購買</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/ticket.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>about</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 🔹 自訂登入/註冊浮出表單樣式 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .popup-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+        <a class="navbar-brand d-flex align-items-center" href="index.html">
+            <img src="img/logo.jpg" alt="Logo" width="40" height="40" class="me-2 rounded-circle">
+            <span>Tixmart</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="events.html">活動總覽</a></li>
+                <li class="nav-item"><a class="nav-link" href="faq.html">常見問題</a></li>
+                <li class="nav-item"><a class="nav-link" href="about.html">關於我們</a></li>
+            </ul>
+            <div class="d-flex">
+                <div class="position-relative me-3">
+                    <a href="cart.html" class="btn btn-danger position-relative">
+                        <i class="fas fa-shopping-cart"></i> 購物車
+                        <span id="cartCount"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="z-index: 1; font-size: 0.75rem;">
+                            0
+                        </span>
+                    </a>
+                </div>
+                <button class="btn btn-outline-light me-2" onclick="openPopup('login')">登入</button>
+                <button class="btn btn-primary" onclick="openPopup('register')">註冊</button>
+            </div>
+        </div>
+    </nav>
+    <!-- 🔹 浮出式登入/註冊表單 -->
+    <div id="overlay" class="overlay">
+        <div class="popup-form">
+            <h5 id="popupTitle" class="mb-3">登入</h5>
+            <form onsubmit="return false;"> <!-- 防止真實送出，方便測試 -->
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <div class="d-flex flex-nowrap">
+                        <input type="email" id="emailInput" class="form-control flex-grow-1 rounded-0 rounded-start"
+                            placeholder="請輸入 Email" required>
+                        <button type="button" id="verifyBtn"
+                            class="btn btn-primary rounded-0 rounded-end ms-1 text-nowrap">驗證信箱</button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">密碼</label>
+                    <input type="password" class="form-control" required>
+                    <button type="button" id="forgotPasswordBtn" class="btn btn-link p-0 mt-1"
+                        style="font-size: 0.875rem;">忘記密碼？</button>
+
+                </div>
+                <div id="confirmPasswordGroup" class="mb-3 d-none">
+                    <label class="form-label">確認密碼</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div id="nameGroup" class="mb-3 d-none">
+                    <label class="form-label">姓名</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div id="phoneGroup" class="mb-3 d-none">
+                    <label class="form-label">電話</label>
+                    <input type="tel" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 mb-2">送出</button>
+                <button type="button" class="btn btn-secondary w-100" onclick="closePopup()">取消</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <h1>資策會小專題用</h1>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateFormMode() {
+            const title = document.getElementById('popupTitle').textContent.trim();
+            const verifyBtn = document.getElementById('verifyBtn');
+            const forgotBtn = document.getElementById('forgotPasswordBtn');
+
+            if (title === '註冊') {
+                verifyBtn.style.display = 'inline-block';
+                forgotBtn.style.display = 'none';
+            } else {
+                verifyBtn.style.display = 'none';
+                forgotBtn.style.display = 'inline-block';
+            }
+        }
+
+        function openPopup(mode) {
+            const overlay = document.getElementById('overlay');
+            const title = document.getElementById('popupTitle');
+            const confirmGroup = document.getElementById('confirmPasswordGroup');
+            const nameGroup = document.getElementById('nameGroup');
+            const phoneGroup = document.getElementById('phoneGroup');
+
+            overlay.style.display = 'flex';
+
+            if (mode === 'login') {
+                title.textContent = '登入';
+                confirmGroup.classList.add('d-none');
+                nameGroup.classList.add('d-none');
+                phoneGroup.classList.add('d-none');
+            } else {
+                title.textContent = '註冊';
+                confirmGroup.classList.remove('d-none');
+                nameGroup.classList.remove('d-none');
+                phoneGroup.classList.remove('d-none');
+            }
+
+            updateFormMode();
+        }
+
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // ✅ 點擊遮罩關閉彈窗（這段要保留）
+        document.getElementById('overlay').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        // 驗證信箱按鈕的事件處理
+        document.getElementById('verifyBtn').addEventListener('click', () => {
+            const email = document.getElementById('emailInput').value.trim();
+            if (!email) {
+                alert('請先輸入信箱');
+                return;
+            }
+            const emailRegex = /^\S+@\S+\.\S+$/;
+            if (emailRegex.test(email)) {
+                alert('信箱格式正確，可以進行驗證');
+                // 可在此呼叫後端 API 驗證信箱是否存在等邏輯
+            } else {
+                alert('信箱格式不正確，請重新輸入');
+            }
+        });
+        document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
+            alert('請聯絡客服或輸入信箱進行重設');
+        });
+
+        // 將目前頁面網址與 nav-link 的 href 比對，並自動加上 active
+        const links = document.querySelectorAll('.navbar-nav .nav-link');
+        const currentPath = window.location.pathname.split('/').pop(); // 取得目前頁面的檔名
+
+        links.forEach(link => {
+            const linkPath = link.getAttribute('href');
+            if (linkPath === currentPath) {
+                link.classList.add('active');
+            }
+        });
+
+        //購物車徽章
+        document.addEventListener("DOMContentLoaded", function () {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const cartCount = document.getElementById("cartCount");
+            cartCount.textContent = cart.length;
+        });
+
+        //更新購物車徽章數量
+        function updateCartBadge() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = cart.length;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", updateCartBadge);
+
+    </script>
+</body>
+
+</html>

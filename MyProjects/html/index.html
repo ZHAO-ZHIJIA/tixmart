@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <title>TixCraft Clone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .card {
+      width: 1000px;
+      height: 650px;
+      /* 固定卡片高度 */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: none;
+      transition: transform 0.2s ease;
+      background: #fff;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .card-img-top {
+      flex-shrink: 0;
+      width: 100%;
+      height: 500px;
+      /* 固定圖片區塊高度 */
+      object-fit: contain;
+      /* 保留比例，完整顯示 */
+      background-color: #000;
+      /* 背景補色 */
+    }
+
+    .card-body {
+      flex-grow: 1;
+      min-height: 150px;
+    }
+
+    /* 增加carousel外層容器底部間距，避免被下方文字切到 */
+    #eventCarousel {
+      margin-bottom: 4rem;
+    }
+
+    /* 左右箭頭加背景和圓形 */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      filter: invert(100%);
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      padding: 12px;
+    }
+
+    /* 調整箭頭按鈕位置與大小，讓點擊區域更大 */
+    .carousel-control-prev,
+    .carousel-control-next {
+      width: 4rem;
+      height: 4rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 1;
+    }
+
+    .more-info {
+      color: #6c757d;
+      /* Bootstrap text-muted 顏色 */
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover .more-info {
+      color: #0d6efd;
+      text-decoration: underline;
+    }
+
+    /* 🔹 自訂登入/註冊浮出表單樣式 */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .popup-form {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-body img:hover {
+      opacity: 0.85;
+      transition: opacity 0.3s;
+    }
+
+    .marquee-vertical {
+      background-color: #ffc107;
+      color: #000;
+      height: 40px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .marquee-wrapper {
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.5s ease-in-out;
+      /* 滑動動畫 */
+    }
+
+    .marquee-item {
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      white-space: nowrap;
+      text-decoration: none;
+      color: inherit;
+      /* 保持文字原色 */
+      display: block;
+      /* 確保整塊可點擊 */
+    }
+
+    .marquee-item:hover {
+      text-decoration: underline;
+      /* 可加上 hover 效果 */
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 🔹 導覽列 -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <img src="img/logo.jpg" alt="Logo" width="40" height="40" class="me-2 rounded-circle">
+      <span>Tixmart</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="events.html">活動總覽</a></li>
+        <li class="nav-item"><a class="nav-link" href="faq.html">常見問題</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">關於我們</a></li>
+      </ul>
+      <div class="d-flex">
+        <div class="position-relative me-3">
+          <a href="cart.html" class="btn btn-danger position-relative">
+            <i class="fas fa-shopping-cart"></i> 購物車
+            <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              style="z-index: 1; font-size: 0.75rem;">
+              0
+            </span>
+          </a>
+        </div>
+        <button class="btn btn-outline-light me-2" onclick="openPopup('login')">登入</button>
+        <button class="btn btn-primary" onclick="openPopup('register')">註冊</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🔹 垂直跑馬燈 -->
+  <div class="marquee-vertical">
+    <div class="marquee-wrapper">
+      <a href="ticket1.html" class="marquee-item">🎤 Vaundy dome tour 2026</a>
+      <a href="ticket2.html" class="marquee-item">🔥 Ado WORLD TOUR 2025 “Hibana” in Taipei</a>
+      <a href="ticket3.html" class="marquee-item">🎶 KENSHI YONEZU 2025 WORLD TOUR / JUNK</a>
+      <a href="ticket4.html" class="marquee-item">🐬 AIMYON TOUR 2025 “Dolphin Apartment” in TAIPEI</a>
+
+      <!-- 👇 無縫複製第一條 -->
+      <a href="ticket1.html" class="marquee-item">🎤 Vaundy dome tour 2026</a>
+    </div>
+  </div>
+
+
+
+  <!-- 🔹 浮出式登入/註冊表單 -->
+  <div id="overlay" class="overlay">
+    <div class="popup-form">
+      <h5 id="popupTitle" class="mb-3">登入</h5>
+      <form onsubmit="return false;"> <!-- 防止真實送出，方便測試 -->
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <div class="d-flex flex-nowrap">
+            <input type="email" id="emailInput" class="form-control flex-grow-1 rounded-0 rounded-start"
+              placeholder="請輸入 Email" required>
+            <button type="button" id="verifyBtn"
+              class="btn btn-primary rounded-0 rounded-end ms-1 text-nowrap">驗證信箱</button>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">密碼</label>
+          <input type="password" class="form-control" required>
+          <button type="button" id="forgotPasswordBtn" class="btn btn-link p-0 mt-1"
+            style="font-size: 0.875rem;">忘記密碼？</button>
+
+        </div>
+        <div id="confirmPasswordGroup" class="mb-3 d-none">
+          <label class="form-label">確認密碼</label>
+          <input type="password" class="form-control">
+        </div>
+        <div id="nameGroup" class="mb-3 d-none">
+          <label class="form-label">姓名</label>
+          <input type="text" class="form-control">
+        </div>
+        <div id="phoneGroup" class="mb-3 d-none">
+          <label class="form-label">電話</label>
+          <input type="tel" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 mb-2">送出</button>
+        <button type="button" class="btn btn-secondary w-100" onclick="closePopup()">取消</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 彈出式頁面 -->
+  <div class="modal fade" id="mainNoticeModal" tabindex="-1" aria-labelledby="mainNoticeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- modal-lg 放大視窗 -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mainNoticeLabel">📢 最新活動公告</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p class="mb-3">🔥 Vaundy 演唱會搶票倒數中，點擊圖片立即前往購票頁！</p>
+          <a href="ticket1.html">
+            <img src="img/vanudy.png" alt="Vaundy" class="img-fluid rounded shadow" style="max-width: 100%;">
+          </a>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <h2 class="mb-4">熱門活動 🔥</h2>
+
+    <div id="eventCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+      <div class="carousel-inner">
+
+        <!-- Vaundy -->
+        <div class="carousel-item active">
+          <div class="d-flex justify-content-center py-3">
+            <a href="ticket1.html" class="text-decoration-none text-dark">
+              <div class="card mx-auto" style="width: 1000px;">
+                <img src="img/vanudy.png" class="card-img-top" alt="Vaundy">
+                <div class="card-body d-flex flex-column justify-content-between" style="height: 150px;">
+                  <div>
+                    <h5 class="card-title">Vaundy dome tour 2026</h5>
+                    <p class="card-text">台北小巨蛋 · 2026/02/29</p>
+                  </div>
+                  <div class="text-end">
+                    <span class="more-info">瞭解更多 >></span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Ado -->
+        <div class="carousel-item">
+          <div class="d-flex justify-content-center py-3">
+            <a href="ticket2.html" class="text-decoration-none text-dark">
+              <div class="card mx-auto" style="width: 1000px;">
+                <img src="img/Ado.jpg" class="card-img-top" alt="Ado">
+                <div class="card-body d-flex flex-column justify-content-between" style="height: 150px;">
+                  <div>
+                    <h5 class="card-title">Ado WORLD TOUR 2025 “Hibana” in Taipei</h5>
+                    <p class="card-text">林口體育館 · 2025/05/11</p>
+                  </div>
+                  <div class="text-end">
+                    <span class="more-info">瞭解更多 >></span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Kenshi Yonezu -->
+        <div class="carousel-item">
+          <div class="d-flex justify-content-center py-3">
+            <a href="ticket3.html" class="text-decoration-none text-dark">
+              <div class="card mx-auto" style="width: 1000px;">
+                <img src="img/KENSHI YONEZU.jpg" class="card-img-top" alt="Kenshi Yonezu">
+                <div class="card-body d-flex flex-column justify-content-between" style="height: 150px;">
+                  <div>
+                    <h5 class="card-title">KENSHI YONEZU 2025 WORLD TOUR / JUNK</h5>
+                    <p class="card-text">台北小巨蛋 · 2025/03/15、16</p>
+                  </div>
+                  <div class="text-end">
+                    <span class="more-info">瞭解更多 >></span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Aimyon -->
+        <div class="carousel-item">
+          <div class="d-flex justify-content-center py-3">
+            <a href="ticket4.html" class="text-decoration-none text-dark">
+              <div class="card mx-auto" style="width: 1000px;">
+                <img src="img/aimyon.jpeg" class="card-img-top" alt="Aimyon">
+                <div class="card-body d-flex flex-column justify-content-between" style="height: 150px;">
+                  <div>
+                    <h5 class="card-title">AIMYON TOUR 2025 “Dolphin Apartment” in TAIPEI</h5>
+                    <p class="card-text">台北流行音樂中心 · 2025/04/12、13</p>
+                  </div>
+                  <div class="text-end">
+                    <span class="more-info">瞭解更多 >></span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Carousel controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#eventCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+        <span class="visually-hidden">上一張</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#eventCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+        <span class="visually-hidden">下一張</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- 🔹 最新消息與影片區塊整合 -->
+  <div class="container mb-5">
+    <div class="mx-auto d-flex" style="max-width: 1000px;">
+      <!-- 左側：最新消息，寬度約三分之一 -->
+      <div style="width: 50%; padding-right: 1rem;">
+        <h4 class="mb-3">📢 最新消息</h4>
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="ticket1.html" class="text-decoration-none flex-grow-1" target="_blank" rel="noopener noreferrer">
+              【6/05】Vaundy dome tour 2026！
+            </a>
+            <a href="ticket1.html" class="text-primary text-decoration-none fw-bold" target="_blank"
+              rel="noopener noreferrer">more</a>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="ticket2.html" class="text-decoration-none flex-grow-1" target="_blank" rel="noopener noreferrer">
+              【6/03】Ado WORLD TOUR 2025 “Hibana” in Taipei
+            </a>
+            <a href="ticket2.html" class="text-primary text-decoration-none fw-bold" target="_blank"
+              rel="noopener noreferrer">more</a>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="ticket3.html" class="text-decoration-none flex-grow-1" target="_blank" rel="noopener noreferrer">
+              【6/01】KENSHI YONEZU 2025 WORLD TOUR / JUNK
+            </a>
+            <a href="ticket3.html" class="text-primary text-decoration-none fw-bold" target="_blank"
+              rel="noopener noreferrer">more</a>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="ticket4.html" class="text-decoration-none flex-grow-1" target="_blank" rel="noopener noreferrer">
+              【6/01】AIMYON TOUR 2025 “Dolphin Apartment” in TAIPEI
+            </a>
+            <a href="ticket4.html" class="text-primary text-decoration-none fw-bold" target="_blank"
+              rel="noopener noreferrer">more</a>
+          </li>
+        </ul>
+      </div>
+
+      <div style="width: 50%; padding-left: 1rem;">
+        <h4 class="mb-3">🎥</h4>
+
+        <div id="videoCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="0" class="active"
+              aria-current="true" aria-label="影片1"></button>
+            <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="1" aria-label="影片2"></button>
+          </div>
+
+          <div class="carousel-inner" style="border-radius: 15px; overflow: hidden;">
+            <div class="carousel-item active">
+              <iframe width="100%" height="315" src="https://www.youtube.com/embed/IGFMmD5KG58" title="影片1"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen style="border-radius: 15px;">
+              </iframe>
+            </div>
+            <div class="carousel-item">
+              <iframe width="100%" height="315" src="https://www.youtube.com/embed/AzASdXvzLtE" title="影片2"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen style="border-radius: 15px;">
+              </iframe>
+            </div>
+          </div>
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#videoCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">上一則</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#videoCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">下一則</span>
+          </button>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+
+
+
+
+  <!-- 🔹 首頁內容 -->
+  <div class="container pt-5 d-flex justify-content-between align-items-center">
+    <div>
+      <h1>歡迎來到 TixCraft Clone</h1>
+      <p>這裡是演唱會售票系統的首頁！</p>
+    </div>
+    <div class="text-end text-muted" style="min-width: 200px;">
+      <small>
+        聯絡我們：04-00000000<br>
+        xxxxxxxx@mail.com<br>
+        Tixmart © 2025
+      </small>
+    </div>
+  </div>
+  <footer class="bg-light text-end py-3 mt-5">
+    <div class="container">
+      <small class="text-muted">
+        TixCraft Clone © 2025 ｜聯絡我們：<a href="mailto:support@tixclone.com">support@tixclone.com</a>
+      </small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/index.js" defer></script>
+
+
+</body>
+
+</html>
